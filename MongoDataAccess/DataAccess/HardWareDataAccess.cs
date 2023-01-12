@@ -11,7 +11,6 @@ namespace MongoDataAccess.DataAccess
         public const string Database = "HardWareDatabase";
         public const string HardWareCollection = "HardWareCollection";
 
-
         private IMongoCollection<T> ConnectToMongo<T>(string collection)
         {
             var client = new MongoClient(ConnectionString);
@@ -19,6 +18,13 @@ namespace MongoDataAccess.DataAccess
             return db.GetCollection<T>(collection);
         }
 
+        public async Task<HardWareModel> GetOneHardWare(HardWareModel hardWare)
+        {
+            var hardwareCollection = ConnectToMongo<HardWareModel>(HardWareCollection);
+            var results = await hardwareCollection.FindAsync(h => h.Id == hardWare.Id);
+            return results.FirstOrDefault();
+            
+        }
         public async Task<List<HardWareModel>> GetAllHardWares()
         {
             var hardwareCollection = ConnectToMongo<HardWareModel>(HardWareCollection);
@@ -44,6 +50,7 @@ namespace MongoDataAccess.DataAccess
             var hardWareCollection = ConnectToMongo<HardWareModel>(HardWareCollection);
             return hardWareCollection.DeleteOneAsync(h => h.Id == hardware.Id);
         }
+
         public int InputMenuControl()
         {
             Console.WriteLine("\n");
@@ -55,79 +62,79 @@ namespace MongoDataAccess.DataAccess
             Console.WriteLine("4. Remove a tool");
             Console.WriteLine("5. End program");
 
-            int val = 0;
+            int choice = 0;
 
-            while (!Int32.TryParse(Console.ReadLine(), out val) || val < 1 || val > 5)
+            while (!Int32.TryParse(Console.ReadLine(), out choice) || choice < 1 || choice > 5)
             {
                 Console.WriteLine("Input is invalid, try again");
             }
-            return val;
+            return choice;
         }
         public int InputModelControl(int valet)
         {
-
-
-            int val = 0;
-            while (!Int32.TryParse(Console.ReadLine(), out val) || val > HardWareCollection.Count() || val < 1)
+            int choice = 0;
+            while (!Int32.TryParse(Console.ReadLine(), out choice) || choice > HardWareCollection.Count() || choice < 1)
             {
                 Console.WriteLine("Input is invalid, try again");
             }
-            return val;
+            return choice;
         }
         public async Task HardWareUpdateControl()
         {
-            string NamnÄndring = "";
-            string BeskrivningÄndring = "";
-            int val = 0;
+            string NameChange = "";
+            string DescriptionChange = "";
+            int choice = 0;
             int counter = 1;
             var hardwares = await GetAllHardWares();
             foreach (var hardWare in hardwares)
             {
-                Console.WriteLine(counter + " " + hardWare.Name);
+                Console.WriteLine(counter + ". " + hardWare.Name);
                 counter++;
             }
 
             Console.WriteLine("Input tool number");
+            
 
-            while (!Int32.TryParse(Console.ReadLine(), out val) || val > HardWareCollection.Count() || val < 1)
+            while (!Int32.TryParse(Console.ReadLine(), out choice) || choice > hardwares.Count() || choice < 1)
             {
                 Console.WriteLine("Input is invalid, try again");
             }
 
-            while (string.IsNullOrEmpty(NamnÄndring))
+            while (string.IsNullOrEmpty(NameChange))
             {
                 Console.WriteLine("Write a name?");
-                NamnÄndring = Console.ReadLine();
-                hardwares[val - 1].Name = NamnÄndring;
+                NameChange = Console.ReadLine();
+                
             }
-            while (string.IsNullOrEmpty(BeskrivningÄndring))
+            hardwares[choice - 1].Name = NameChange;
+            while (string.IsNullOrEmpty(DescriptionChange))
             {
                 Console.WriteLine("Write a discription?");
-                BeskrivningÄndring = Console.ReadLine();
-                hardwares[val - 1].Description = BeskrivningÄndring;
+                DescriptionChange = Console.ReadLine();  
             }
-            await UpdateHardWare(hardwares[val - 1]);
+            hardwares[choice - 1].Description = DescriptionChange;
+            await UpdateHardWare(hardwares[choice - 1]);
             Console.WriteLine($"Tool updated\n");
         }
         public async Task HardWareDeleteControl()
         {
             int counter1 = 1;
-            int val;
+            int choice;
             var hardWareCollection1 = await GetAllHardWares();
             foreach (var hardWares in hardWareCollection1)
             {
-                Console.WriteLine($"{counter1}. Name:{hardWares.Name}\n" +
-                                  $"   Discpription: {hardWares.Description}\n");
+                Console.WriteLine($"{counter1}. Name:{hardWares.Name}\n");
+                                  
                 counter1++;
             }
             Console.WriteLine("Input the number of what tool would you like to remove");
             //val > HardWareCollection.Count() ||
-            while (!Int32.TryParse(Console.ReadLine(), out val) || val < 1)
+            while (!Int32.TryParse(Console.ReadLine(), out choice) || choice < 1)
             {
                 Console.WriteLine("Input is invalid, try again");
             }
             
-            await DeleteHardWare(hardWareCollection1[val - 1]);
+            await DeleteHardWare(hardWareCollection1[choice - 1]);
             Console.WriteLine($"Tool Erased\n");
         }
     }

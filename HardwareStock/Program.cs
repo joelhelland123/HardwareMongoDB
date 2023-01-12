@@ -5,24 +5,29 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Diagnostics.Metrics;
 
+HardWareDataAccess db = new HardWareDataAccess();
+
+await db.CreateHardWare(new HardWareModel()
+{
+    Name = "Såg",
+    Description = "En såg är ett verktyg för att kapa och klyva material. Den har oftast ett handtag, " +
+    "men kan ha flera. Det finns flera typer av sågar med sinsemellan olika användningsområden. " +
+    "Vanligast är sågar avsedda för att såga trä, men det finns också sågar avsedda för metall"
+});
+
+await db.CreateHardWare(new HardWareModel()
+{
+    Name = "Hammare",
+    Description = "En hammare består av huvud och skaft. Skaftet kan vara av trä, metall eller glasfiber." +
+    " Det fästs i det elliptiskt koniska ögat i huvudet och kilas fast med metall- eller träkil i ett sågat spår i skaftet (om detta är av trä). " +
+    "Det hela kan förstärkas med epoxylim som fyller ut luckor i ögat mellan skaft och huvud. Ytterligare förstärkning kan förekomma med järnhakar genom ögat." +
+    " Hakarna spikas fast mot skaftet.\r\n\r\nEtt träskaft ska vara av hårt träslag som krymper så lite som möjligt vid varierande fuktighet. Bästa svenska träslag är ask, av utländska träslag är hickory bäst."
+
+});
+
 while (true)
 {
-    HardWareDataAccess db = new HardWareDataAccess();
     int userChoice = db.InputMenuControl();
-
-    //await db.CreateHardWare(new HardWareModel()
-    //{
-    //    Namn = "Såg",
-    //    Beskrivning = "Kan såga"
-    //});
-
-    //await db.CreateHardWare(new HardWareModel()
-    //{
-    //    Namn = "Hammare",
-    //    Beskrivning = "Kan Hamra"
-
-    //});
-
 
     switch (userChoice)
     {
@@ -45,63 +50,31 @@ while (true)
             await db.CreateHardWare(hardWare);
             Console.WriteLine("Tool added\n");
             break;
+
         case 2:
             int counter = 1;
             var hardWareCollection = await db.GetAllHardWares();
             foreach (var hardWares in hardWareCollection)
             {
-                Console.WriteLine($"{counter}. Name:{hardWares.Name}\n" +
-                                  $"   discription: {hardWares.Description}\n");
+                Console.WriteLine($"{counter}. Name:{hardWares.Name}\n");
+                                 
                 counter++;
             }
             Console.WriteLine("\n");
-
             break;
-
 
         case 3:
             await db.HardWareUpdateControl();
-            //var hardwares = await db.GetAllHardWares();
-            //int räknare = 1;
-            //foreach(var hardware in hardwares)
-            //{
-            //    Console.WriteLine(räknare + hardware.Namn);
-            //    räknare++;
-            //}
-            //Console.WriteLine("Välj ett av verktygen");
-            //int val = int.Parse(Console.ReadLine());
-            //HardWareModel valet = hardwares[val-1];
-            //Console.WriteLine("Skriv in ett namn");
-            //string namnet = Console.ReadLine();
-            //valet.Namn = namnet;
-            //var hardwares = new HardWareModel();
-            //await db.UpdateHardWare(db.HardWareControl(hardwares());
-            //var filter = Builders<BsonDocument>.Filter.Eq("Namn", "Hammare");
-            //var update = Builders<BsonDocument>.Update.Set("Namn", filter);
-            //hardWareCollection = await db.GetAllHardWares();
-
             break;
+
         case 4:
             await db.HardWareDeleteControl();
-            //int counter1 = 1;
-            //int val;
-            //var hardWareCollection1 = await db.GetAllHardWares();
-            //foreach (var hardWares in hardWareCollection1)
-            //{
-            //    Console.WriteLine($"{counter1}. Namn:{hardWares.Namn}\n Beskrivning: {hardWares.Beskrivning}");
-            //    counter1++;
-            //}
-            //Console.WriteLine("Skriv den in siffran på verktyget du önskar");
-            ////val > HardWareCollection.Count() ||
-            //while (!Int32.TryParse(Console.ReadLine(), out val) ||  val < 1)
-            //{
-            //    Console.WriteLine("Du behöver skriva en siffra, välj något av alternativen");
-            //}
-            //await db.DeleteHardWare(hardWareCollection1[val-1]);
             break;
+
         case 5:
             Environment.Exit(1);
             break;
+
         default:
             break;
     }
